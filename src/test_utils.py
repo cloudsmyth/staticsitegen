@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextType, TextNode
-from utils import split_by_delimiter
+from utils import split_by_delimiter, split_by_image, split_by_link
 
 
 class TestSplitByDelimiter(unittest.TestCase):
@@ -55,3 +55,43 @@ class TestSplitByDelimiter(unittest.TestCase):
         for i in range(len(result)):
             self.assertEqual(result[i].text, expected[i].text)
             self.assertEqual(result[i].text_type, expected[i].text_type)
+
+    def test_split_images(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_by_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE,
+                         "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE,
+                    "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
+        )
+
+    def test_split_link(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.TEXT,
+        )
+        new_nodes = split_by_link([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with a link ", TextType.TEXT),
+                TextNode("to boot dev", TextType.LINK,
+                         "https://www.boot.dev"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode(
+                    "to youtube", TextType.LINK,
+                    "https://www.youtube.com/@bootdotdev"
+                ),
+            ],
+            new_nodes,
+        )
