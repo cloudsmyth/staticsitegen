@@ -2,6 +2,14 @@ import re
 from textnode import TextNode, TextType
 
 
+def extract_title(md):
+    lines = md.split("\n")
+    for line in lines:
+        if line.startswith("# "):
+            return line[2:].strip()
+    raise Exception("No header found to use as title!")
+
+
 def split_by_full(text):
     nodes = [TextNode(text, TextType.TEXT)]
     nodes = split_by_delimiter(nodes, "**", TextType.BOLD)

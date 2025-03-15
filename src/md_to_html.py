@@ -10,7 +10,7 @@ def markdown_to_html_node(md):
     blocks = markdown_to_blocks(md)
     children = []
     for block in blocks:
-        html_node = block_to_blocktype(block)
+        html_node = block_to_html_node(block)
         children.append(html_node)
     return ParentNode("div", children, None)
 
@@ -26,7 +26,7 @@ def block_to_html_node(block):
     elif typ == BlockType.UNORDERED:
         return markdown_unordered(block)
     elif typ == BlockType.ORDERED:
-        return markdown_ordered()
+        return markdown_ordered(block)
     elif typ == BlockType.CODE:
         return markdown_code(block)
 
@@ -59,7 +59,7 @@ def markdown_quote(block):
 
 def markdown_unordered(block):
     lines = block.split("\n")
-    li_nodes = [HTMLNode("li", None, text_to_node(line[2:]))
+    li_nodes = [ParentNode("li", text_to_node(line[2:]))
                 for line in lines
                 if line.startswith("- ")]
     return ParentNode("ul", li_nodes)
@@ -75,7 +75,7 @@ def markdown_ordered(block):
             # This gets the text after the number.
             item_text = match.group(1)
             li_nodes.append(
-                HTMLNode("li", None, text_to_node(item_text)))
+                ParentNode("li", text_to_node(item_text)))
     return ParentNode("ol", li_nodes)
 
 

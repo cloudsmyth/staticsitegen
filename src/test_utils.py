@@ -1,6 +1,7 @@
 import unittest
 from textnode import TextType, TextNode
-from utils import split_by_full, split_by_delimiter, split_by_image, split_by_link
+from utils import (split_by_full, split_by_delimiter,
+                   split_by_image, split_by_link, extract_title)
 
 
 class TestSplit(unittest.TestCase):
@@ -113,3 +114,22 @@ class TestSplit(unittest.TestCase):
             ],
             new_nodes,
         )
+
+    def test_extract_header(self):
+        md = "# Hello   "
+        expected = "Hello"
+        self.assertEqual(extract_title(md), expected)
+
+    def test_no_header_raises_exception(self):
+        # Markdown text with no header
+        md_without_header = """
+        This is some markdown text.
+        It has multiple lines.
+        But none of them start with #
+        So it should raise an exception.
+        """
+        with self.assertRaises(Exception) as context:
+            extract_title(md_without_header)
+        # Optionally, verify the exception message
+        self.assertEqual(str(context.exception),
+                         "No header found to use as title!")
